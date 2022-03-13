@@ -1,1 +1,1 @@
-This little function converts an image into a string of ANSI terminal codes that displays a low-res version of the image in the terminal.
+This little function converts an image into a string of ANSI terminal codes that displays a low-res version of the image in the terminal. This was built to display album art for a terminal music player.
