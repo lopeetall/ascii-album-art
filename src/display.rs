@@ -1,17 +1,23 @@
-use image::{GenericImageView, Pixel};
-use image::imageops::FilterType;
+use image::Pixel;
+use image::imageops::thumbnail;
 
-pub fn display_album_cover(path: &str, size: u32) {
+pub fn image_string(path: &str, size: u32) -> String {
     let img = image::open(path).unwrap();
-    let scaled = img.resize(size, size, FilterType::Nearest);
-    let scaled_pixels = scaled.pixels().map(|p| p.2.to_rgb()).collect::<Vec<_>>();
 
-    let grid = (0..size as usize)
-        .map(|i| scaled_pixels[i*size as usize..(i+1)*size as usize]
-            .iter()
-            .map(|rgb| format!("\u{1b}[48;2;{:?};{:?};{:?}m  ", rgb[0], rgb[1], rgb[2]))
-            .collect::<Vec<_>>().join("")
-        ).collect::<Vec<_>>().join("\u{1b}[0m\n");
-
-    println!("{}\u{1b}[0m", grid);
+    format!("{}\u{1b}[0m",
+        thumbnail(&img, size, size)
+            .pixels()
+            .map(|p| p.to_rgb())
+            .collect::<Vec<_>>()
+            .chunks(size as usize)
+            .map(|r| 
+                r
+                    .into_iter()
+                    .map(|rgb| format!("\u{1b}[48;2;{:?};{:?};{:?}m  ", rgb[0], rgb[1], rgb[2]))
+                    .collect::<Vec<_>>()
+                    .join("")
+            )
+            .collect::<Vec<_>>()
+            .join("\u{1b}[0m\n")
+    )
 }
